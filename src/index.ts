@@ -6,6 +6,7 @@ import { config } from './config';
 import { routerV1 } from './routes/v1';
 import { errorHandler } from './middlewares/errorHandler';
 import { ErrorKey } from './types/http/error';
+import { createHttpErr } from './utils/createHttpErr';
 
 // global.__basedir = __dirname;
 
@@ -25,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test', (req, res) => {
-  throw ErrorKey.AUTH_REQUIRED;
+  throw createHttpErr(ErrorKey.AUTH_REQUIRED, 'Missing access_token');
 });
 
 app.use(errorHandler);
