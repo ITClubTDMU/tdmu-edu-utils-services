@@ -1,9 +1,11 @@
 import bodyParser from 'body-parser';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 // import { router } from "./routes";
 import { config } from './config';
 import { routerV1 } from './routes/v1';
+import { errorHandler } from './middlewares/errorHandler';
+import { ErrorKey } from './types/http/error';
 
 // global.__basedir = __dirname;
 
@@ -21,6 +23,12 @@ app.use('/api/v1', routerV1);
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
+
+app.get('/test', (req, res) => {
+  throw ErrorKey.AUTH_REQUIRED;
+});
+
+app.use(errorHandler);
 
 // import OpenAI from 'openai';
 // const client = new OpenAI();
