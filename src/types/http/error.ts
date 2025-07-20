@@ -6,7 +6,8 @@ export enum ErrorKey {
   FORBIDDEN = 'FORBIDDEN',
   NOT_FOUND = 'NOT_FOUND',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
-  INVALID_ERROR_KEY = 'INVALID_ERROR_KEY'
+  INVALID_ERROR_KEY = 'INVALID_ERROR_KEY',
+  DKMH_EXPIRED_TOKEN = 'DKMH_EXPIRED_TOKEN'
 }
 
 export const errTypes = {
@@ -39,6 +40,11 @@ export const errTypes = {
     code: 500,
     statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
     message: 'Invalid error key'
+  },
+  DKMH_EXPIRED_TOKEN: {
+    code: 1111,
+    statusCode: EHttpStatusCode.AUTH_REQUIRED,
+    message: 'DKMH expired token'
   }
 } as const;
 

@@ -1,4 +1,4 @@
-import { EHttpStatusCode, ErrorKey, TError } from '~/types/http';
+import { ErrorKey, TError, TResponse } from '~/types/http';
 import { ERROR_HELPER } from './error';
 
 export const createHttpErr = (err: ErrorKey | TError, message?: string) => {
@@ -8,5 +8,13 @@ export const createHttpErr = (err: ErrorKey | TError, message?: string) => {
   return {
     ...errObj,
     message: customMessage
+  };
+};
+
+export const createHttpSuccess = <T = any>(data: T): TResponse<T> => {
+  return {
+    data,
+    success: true,
+    error: null
   };
 };

@@ -23,6 +23,10 @@ export function errorHandler(errObj: TError, req: Request, res: Response, next: 
       }
     });
   } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(errObj);
+    }
+
     (error as Error).message = 'Internal Server Error at errorHandler line 27';
     next(error);
   }

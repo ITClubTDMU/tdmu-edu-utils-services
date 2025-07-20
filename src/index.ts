@@ -6,7 +6,7 @@ import { config } from './config';
 import { routerV1 } from './routes/v1';
 import { errorHandler } from './middlewares/errorHandler';
 import { ErrorKey } from './types/http/error';
-import { createHttpErr } from './utils/createHttpErr';
+import { createHttpErr } from './utils/createHttpResponse';
 
 // global.__basedir = __dirname;
 

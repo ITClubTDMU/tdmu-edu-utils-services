@@ -17,10 +17,11 @@ export type TResponse<T = unknown> = {
   error: TError | null;
 };
 
-export type TResponseDKMH = {
+export type TResponseDKMH<T = any> = {
   result: boolean;
   message: string;
   code: number;
+  data?: T;
 };
 
 export { errTypes, ErrorKey, TError };
