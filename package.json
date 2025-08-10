@@ -19,6 +19,7 @@
     "@eslint/js": "^9.25.1",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.15.3",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.2",
@@ -34,11 +35,21 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "docx-pdf": "^0.0.1",
+    "docxtemplater": "^3.65.2",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "form-data": "^4.0.4",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "multer": "^2.0.2",
     "openai": "^4.97.0",
+    "pdfjs-dist": "^5.4.54",
+    "pizzip": "^3.2.0",
     "postgres": "^3.4.5"
   }
 }

@@ -7,15 +7,23 @@ import { routerV1 } from './routes/v1';
 import { errorHandler } from './middlewares/errorHandler';
 import { ErrorKey } from './types/http/error';
 import { createHttpErr } from './utils/createHttpResponse';
+import { ensureDir } from './utils/esureDir';
+
+import fsLib from './lib/fs';
+import path from 'path';
+
+ensureDir('public');
+ensureDir(fsLib.path.archive);
 
 // global.__basedir = __dirname;
-
 const app = express();
 
 app.use(express.json());
-app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use('/public', express.static(path.join(__dirname, '../public')));
+app.use('/' + fsLib.path.archive, express.static(path.join(__dirname, '../archive')));
 
 app.use(cors());
 
