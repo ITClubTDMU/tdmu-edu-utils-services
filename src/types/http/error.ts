@@ -1,4 +1,4 @@
-import { EHttpStatusCode } from '.';
+import { EHttpStatusCode } from "./status";
 
 export enum ErrorKey {
   BAD_REQUEST = 'BAD_REQUEST',
@@ -7,7 +7,8 @@ export enum ErrorKey {
   NOT_FOUND = 'NOT_FOUND',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
   INVALID_ERROR_KEY = 'INVALID_ERROR_KEY',
-  DKMH_EXPIRED_TOKEN = 'DKMH_EXPIRED_TOKEN'
+  DKMH_EXPIRED_TOKEN = 'DKMH_EXPIRED_TOKEN',
+  DKMH_LOGIN_FAILED = 'DKMH_LOGIN_FAILED'
 }
 
 export const errTypes = {
@@ -45,6 +46,11 @@ export const errTypes = {
     code: 1111,
     statusCode: EHttpStatusCode.AUTH_REQUIRED,
     message: 'DKMH expired token'
+  },
+  DKMH_LOGIN_FAILED: {
+    code: 403,
+    statusCode: EHttpStatusCode.FORBIDDEN,
+    message: 'DKMH login failed'
   }
 } as const;
 

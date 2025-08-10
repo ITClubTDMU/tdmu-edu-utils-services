@@ -11,6 +11,9 @@ function handleFetchResponse<T>(data: TResponseDKMH<T>) {
       message: data.message ?? 'Unknown error from remote server'
     };
   }
+
+  if (data.code === 403) throw createHttpErr(ErrorKey.DKMH_LOGIN_FAILED, 'Login failed');
+
   return data.data as T;
 }
 

@@ -5,32 +5,56 @@ import { EHttpStatusCode } from '~/types/http';
 
 const BASE_DKMH_URL = 'https://dkmh.tdmu.edu.vn/api';
 
+const getAccessToken = (req: Request) => {
+  const authHeader = req.headers['dkmh-authorization'] ?? '';
+  return typeof authHeader === 'string' ? authHeader.split(' ')[1] : '';
+};
+
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { access_token } = req.body;
-
+    console.log(' MM ', access_token);
     const url = `${BASE_DKMH_URL}/auth/login`;
     const body = `username=user@gw&password={{password}}&grant_type=password`.replace('{{password}}', access_token);
 
-    const response = await fetch(url, {
+    const obj = {
+      username: 'user@gw',
+      password: access_token,
+      uri: 'https://dkmh.tdmu.edu.vn/#/home'
+    };
+
+    // Bước 1: JSON.stringify
+    const jsonString = JSON.stringify(obj);
+
+    // Bước 2: encode Base64 URL-safe
+    const base64 = btoa(jsonString) // <- dùng trong trình duyệt
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, ''); // xóa dấu "=" ở cuối (URL-safe)
+
+    const response = await fetch(BASE_DKMH_URL + '/pn-signin?code=' + base64 + '&gopage=&mgr=1', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: body
+    });
+    const dataJson = await response.json();
+    const result = handleFetchResponse<{ access_token: string }>({
+      ...dataJson,
+      data: dataJson
     });
 
-    const data = handleFetchResponse(await response.json());
-
-    res.status(EHttpStatusCode.OK).json(createHttpSuccess(data));
+    console.log('zz result', result);
+    res.status(EHttpStatusCode.OK).json(createHttpSuccess(result));
   } catch (err) {
     next(err);
   }
 };
 
 export const tkbTuanHocKy = async (req: Request, res: Response, next: NextFunction) => {
-  const { access_token, hoc_ky } = req.body;
-
+  const { hoc_ky } = req.body;
+  const access_token = getAccessToken(req);
+  console.log(access_token);
   const url = `${BASE_DKMH_URL}/sch/w-locdstkbtuanusertheohocky`;
   const payload = {
     filter: {
@@ -69,7 +93,8 @@ export const tkbTuanHocKy = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const ketQuaHocTap = async (req: Request, res: Response, next: NextFunction) => {
-  const { access_token, hoc_ky } = req.body;
+  const { hoc_ky } = req.body;
+  const access_token = getAccessToken(req);
 
   const url = `${BASE_DKMH_URL}/dkmh/w-inketquahoctap`;
   const payload = {
@@ -94,7 +119,7 @@ export const ketQuaHocTap = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const getDSThongBao = async (req: Request, res: Response, next: NextFunction) => {
-  const { access_token } = req.body;
+  const access_token = getAccessToken(req);
   const url = `https://dkmh.tdmu.edu.vn/api/web/w-locdschucnang`;
   const response = await fetch(url, {
     method: 'POST',
@@ -109,7 +134,7 @@ export const getDSThongBao = async (req: Request, res: Response, next: NextFunct
 };
 
 export const studentInfo = async (req: Request, res: Response, next: NextFunction) => {
-  const { access_token } = req.body;
+  const access_token = getAccessToken(req);
 
   const url = `${BASE_DKMH_URL}/dkmh/w-locsinhvieninfo`;
 
@@ -130,26 +155,10 @@ export const studentInfo = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const getHocKy = async (req: Request, res: Response, next: NextFunction) => {
-  const { access_token } = req.body;
+  const { payload } = req.body;
+  const access_token = getAccessToken(req);
 
   const url = `${BASE_DKMH_URL}/sch/w-locdshockytkbuser`;
-  const payload = {
-    filter: {
-      is_tieng_anh: null
-    },
-    additional: {
-      paging: {
-        limit: 100,
-        page: 1
-      },
-      ordering: [
-        {
-          name: 'hoc_ky',
-          order_type: 1
-        }
-      ]
-    }
-  };
 
   try {
     const response = await fetch(url, {
@@ -160,8 +169,9 @@ export const getHocKy = async (req: Request, res: Response, next: NextFunction) 
       },
       body: JSON.stringify(payload)
     });
-
-    const data = handleFetchResponse(await response.json());
+    const json = await response.json();
+    console.log(json);
+    const data = handleFetchResponse(json);
     res.status(EHttpStatusCode.OK).json(createHttpSuccess(data));
   } catch (err) {
     next(err);

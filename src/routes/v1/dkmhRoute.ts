@@ -5,7 +5,7 @@ import { isExpireDkmhToken } from '~/middlewares/checkDkmhToken';
 
 const router = Router();
 
-router.post('/login', login, isExpireDkmhToken);
+router.post('/login', login);
 router.post('/tkbtuanhocky', tkbTuanHocKy, isExpireDkmhToken);
 router.post('/getHocKy', getHocKy, isExpireDkmhToken);
 router.post('/studentInfo', studentInfo, isExpireDkmhToken);

@@ -1,15 +1,6 @@
 import { errTypes, TError, ErrorKey } from './error';
 
-export enum EHttpStatusCode {
-  OK = 200,
-  CREATED = 201,
-  NO_CONTENT = 204,
-  BAD_REQUEST = 400,
-  AUTH_REQUIRED = 401,
-  FORBIDDEN = 403,
-  NOT_FOUND = 404,
-  INTERNAL_SERVER_ERROR = 500
-}
+import { EHttpStatusCode } from './status';
 
 export type TResponse<T = unknown> = {
   success: boolean;
@@ -24,4 +15,4 @@ export type TResponseDKMH<T = any> = {
   data?: T;
 };
 
-export { errTypes, ErrorKey, TError };
+export { errTypes, ErrorKey, TError, EHttpStatusCode };
