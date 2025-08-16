@@ -34,7 +34,7 @@
     "typescript-eslint": "^8.31.1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.55.0",
     "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
@@ -46,6 +46,7 @@
     "form-data": "^4.0.4",
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
+    "jose": "^6.0.12",
     "multer": "^2.0.2",
     "openai": "^4.97.0",
     "pdfjs-dist": "^5.4.54",
