@@ -38,6 +38,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
     "axios": "^1.11.0",
+    "base64-arraybuffer": "^1.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",

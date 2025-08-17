@@ -6,19 +6,19 @@ import { ERROR_HELPER } from '~/utils/error';
 export function errorHandler(errObj: TError, req: Request, res: Response, next: NextFunction) {
   try {
     const statusCode = errObj.statusCode || EHttpStatusCode.INTERNAL_SERVER_ERROR;
-    const code = errObj.code || 'UNKNOWN_ERROR';
+    const status = errObj.status || 'UNKNOWN_ERROR';
     const message = errObj.message || ERROR_HELPER.getMessage(ErrorKey.INTERNAL_SERVER_ERROR);
 
     if (process.env.NODE_ENV !== 'production') {
       console.error(errObj);
     }
 
-    res.status(statusCode).json({
+    res.status(status).json({
       success: false,
       data: null,
       error: {
         message,
-        code,
+        status,
         statusCode
       }
     });
