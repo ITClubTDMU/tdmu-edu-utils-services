@@ -12,6 +12,7 @@ router.use('/dkmh', checkDkmhToken, dkmhRouter);
 router.use('/docx-var', docxVarRouter);
 router.use('/time-table', authMiddleware, timeTableRouter);
 router.use('/workspace', workspaceRouter);
+router.use('/workspaces', workspaceRouter);
 
 router.get('/test2', authMiddleware, (req, res) => {
   res.status(200).json({ message: 'Hello World' });

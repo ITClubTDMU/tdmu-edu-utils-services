@@ -13,7 +13,6 @@ const getAccessToken = (req: Request) => {
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { access_token } = req.body;
-    console.log(' MM ', access_token);
     const url = `${BASE_DKMH_URL}/auth/login`;
     const body = `username=user@gw&password={{password}}&grant_type=password`.replace('{{password}}', access_token);
 
@@ -44,7 +43,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       data: dataJson
     });
 
-    console.log('zz result', result);
     res.status(EHttpStatusCode.OK).json(createHttpSuccess(result));
   } catch (err) {
     next(err);
@@ -54,7 +52,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const tkbTuanHocKy = async (req: Request, res: Response, next: NextFunction) => {
   const { hoc_ky } = req.body;
   const access_token = getAccessToken(req);
-  console.log(access_token);
   const url = `${BASE_DKMH_URL}/sch/w-locdstkbtuanusertheohocky`;
   const payload = {
     filter: {
@@ -170,7 +167,6 @@ export const getHocKy = async (req: Request, res: Response, next: NextFunction) 
       body: JSON.stringify(payload)
     });
     const json = await response.json();
-    console.log(json);
     const data = handleFetchResponse(json);
     res.status(EHttpStatusCode.OK).json(createHttpSuccess(data));
   } catch (err) {

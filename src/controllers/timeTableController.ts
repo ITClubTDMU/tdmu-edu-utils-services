@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { sbdb } from '~/lib/supabase';
+import { sbdb, sbdbPublic } from '~/lib/supabase';
 import { EHttpStatusCode, ErrorKey } from '~/types/http';
 import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 

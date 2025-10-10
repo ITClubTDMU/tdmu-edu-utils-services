@@ -36,7 +36,6 @@ function modifyDocx(inputPath: any, outputPath: any, replacements?: any) {
 
     const buffer = doc.getZip().generate({ type: 'nodebuffer' });
     fs.writeFileSync(outputPath, buffer);
-    console.log(`DOCX modified: ${outputPath}`);
   } catch (error) {
     console.error('Error modifying DOCX:', error);
     throw error;
@@ -44,7 +43,6 @@ function modifyDocx(inputPath: any, outputPath: any, replacements?: any) {
 }
 
 export const uploadFile = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.file);
   if (!req.file) {
     next(new Error('No file uploaded'));
     return;

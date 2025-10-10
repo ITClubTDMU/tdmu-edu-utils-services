@@ -5,7 +5,6 @@ import { createHttpErr } from '~/utils/createHttpResponse';
 export const checkDkmhToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['dkmh-authorization'];
   const { access_token } = req.body;
-  console.log(authHeader);
   if (!authHeader && !access_token) {
     throw createHttpErr(ErrorKey.AUTH_REQUIRED, 'Missing Dkmh-Authorization');
   }

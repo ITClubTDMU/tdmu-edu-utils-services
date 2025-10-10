@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "genDbTypes": "npx supabase gen types typescript --project-id '' --schema public > src/types/supabase.ts"
+    "genDbTypes": "npx supabase gen types typescript --project-id '' --schema public > src/types/db/database.types.ts"
   },
   "keywords": [],
   "author": "",
@@ -54,6 +54,7 @@
     "openai": "^4.97.0",
     "pdfjs-dist": "^5.4.54",
     "pizzip": "^3.2.0",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "uuid": "^11.1.0"
   }
 }
