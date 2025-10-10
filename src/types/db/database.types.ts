@@ -62,6 +62,78 @@ export type Database = {
         }
         Relationships: []
       }
+      facebook_posts: {
+        Row: {
+          content: string | null
+          converted_time: string | null
+          created_at: string
+          id: number
+          images: string | null
+          is_hot_news: boolean
+          page_name: string | null
+          short_name: string | null
+          time: string | null
+          title: string | null
+          type: Database["public"]["Enums"]["fb_post_type"] | null
+          url: string | null
+        }
+        Insert: {
+          content?: string | null
+          converted_time?: string | null
+          created_at?: string
+          id?: number
+          images?: string | null
+          is_hot_news?: boolean
+          page_name?: string | null
+          short_name?: string | null
+          time?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["fb_post_type"] | null
+          url?: string | null
+        }
+        Update: {
+          content?: string | null
+          converted_time?: string | null
+          created_at?: string
+          id?: number
+          images?: string | null
+          is_hot_news?: boolean
+          page_name?: string | null
+          short_name?: string | null
+          time?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["fb_post_type"] | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      locations: {
+        Row: {
+          description: string | null
+          id: number
+          images: string[] | null
+          lat: number
+          lng: number
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: number
+          images?: string[] | null
+          lat: number
+          lng: number
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: number
+          images?: string[] | null
+          lat?: number
+          lng?: number
+          name?: string
+        }
+        Relationships: []
+      }
       n8n_chat_histories: {
         Row: {
           id: number
@@ -186,6 +258,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rss_profiles: {
+        Row: {
+          avatar: string | null
+          name: string | null
+          short_name: string
+          url: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          name?: string | null
+          short_name: string
+          url?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          name?: string | null
+          short_name?: string
+          url?: string | null
+        }
+        Relationships: []
       }
       semesters: {
         Row: {
@@ -582,6 +675,7 @@ export type Database = {
     Enums: {
       category_type: "global" | "user"
       doc_category: "default" | "văn bản"
+      fb_post_type: "training_point" | "event" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -711,6 +805,7 @@ export const Constants = {
     Enums: {
       category_type: ["global", "user"],
       doc_category: ["default", "văn bản"],
+      fb_post_type: ["training_point", "event", "other"],
     },
   },
 } as const
