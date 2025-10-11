@@ -31,7 +31,10 @@ export const config = {
     // SENDGRID email credentials
     apiKey: process.env.SENDGRID_API_KEY,
     sender: process.env.SENDGRID_SENDER
-  }
+  },
+  supabaseUrl: process.env.SB_PROJECT_URL,
+  supabaseServiceRole: process.env.SB_SERVICE_ROLE,
+  prefixPublicStoragePath: process.env.SB_PROJECT_URL + '/storage/v1/object/public'
 };
 
 export enum MODES {

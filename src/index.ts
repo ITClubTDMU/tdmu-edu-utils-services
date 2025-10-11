@@ -23,7 +23,8 @@ const app = express();
 const corsOptions = {
   origin: [
     'http://localhost:3000', // React/Next.js local
-    'https://yourdomain.com' // domain production
+    'https://yourdomain.com', // domain production
+    'http://192.168.43.5:3000'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
