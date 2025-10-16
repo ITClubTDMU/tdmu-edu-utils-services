@@ -10,11 +10,18 @@ export const edudocTest = async (req: Request, res: Response) => {
 // #region Document APIs
 export const getListDocuments = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { data, error } = await sbdb.schema('edudoc').from('documents').select('*').eq('in_trash', false);
+    const { page = 1, pageSize = 10, keyword = '' } = req.query;
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('documents')
+      .select('*')
+      .eq('in_trash', false)
+      .like('name', `%${keyword}%`);
+
     if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
 
     const documents = await Promise.all(
-      data.map(async (document) => {
+      data.slice((Number(page) - 1) * Number(pageSize), Number(page) * Number(pageSize)).map(async (document) => {
         const { data: voteData } = await sbdb
           .schema('edudoc')
           .from('documents_votes')
