@@ -150,3 +150,52 @@ export const updateFolderById = async (req: Request, res: Response) => {
 };
 
 // #endregion
+
+// #region Document Votes APIs
+
+export const voteDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('documents_votes')
+      .upsert(
+        {
+          user_id: req?.user_id ?? '',
+          document_id: id,
+          vote_type: 1
+        },
+        {
+          onConflict: 'user_id,document_id'
+        }
+      );
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downVoteDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('documents_votes')
+      .upsert(
+        {
+          user_id: req?.user_id ?? '',
+          document_id: id,
+          vote_type: -1
+        },
+        {
+          onConflict: 'user_id,document_id'
+        }
+      );
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
+};
+// #endregion
