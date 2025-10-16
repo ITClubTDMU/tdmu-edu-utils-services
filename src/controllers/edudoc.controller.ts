@@ -1,28 +1,129 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { sbdb } from '~/lib/supabase';
+import { ErrorKey } from '~/types/http';
+import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 
 export const edudocTest = async (req: Request, res: Response) => {
   res.status(200).json({ message: 'Hello World' });
 };
 
 // #region Document APIs
-export const getListDocuments = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const getListDocuments = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { data, error } = await sbdb.schema('edudoc').from('documents').select('*').eq('in_trash', false);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+
+    const documents = await Promise.all(
+      data.map(async (document) => {
+        const { data: voteData } = await sbdb
+          .schema('edudoc')
+          .from('documents_votes')
+          .select('*')
+          .eq('document_id', document.id);
+
+        const { data: downloadData } = await sbdb
+          .schema('edudoc')
+          .from('document_downloads')
+          .select('*')
+          .eq('document_id', document.id);
+
+        const { data: authorData } = await sbdb
+          .from('profiles')
+          .select('*')
+          .eq('id', document.uploaded_by)
+          .maybeSingle();
+
+        const voteInfo = {
+          up: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
+          down: voteData?.filter((vote) => vote.vote_type == -1).length || 0
+        };
+
+        const downloadInfo = {
+          total: downloadData?.length || 0
+        };
+
+        return { ...document, voteInfo, downloadInfo, authorInfo: authorData };
+      })
+    );
+    res.status(200).json(createHttpSuccess(documents));
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const getDocumentById = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const getDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb.schema('edudoc').from('documents').select('*').eq('id', id).maybeSingle();
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    if (!data) throw createHttpErr(ErrorKey.NOT_FOUND, 'Document not found');
+    const { data: voteData } = await sbdb.schema('edudoc').from('documents_votes').select('*').eq('document_id', id);
+    const { data: downloadData } = await sbdb
+      .schema('edudoc')
+      .from('document_downloads')
+      .select('*')
+      .eq('document_id', id);
+
+    const voteInfo = {
+      up: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
+      down: voteData?.filter((vote) => vote.vote_type == -1).length || 0
+    };
+    const downloadInfo = {
+      total: downloadData?.length || 0
+    };
+
+    const { data: authorData } = await sbdb.from('profiles').select('*').eq('id', data.uploaded_by).maybeSingle();
+
+    const documentInfo = { ...data, voteInfo, downloadInfo, authorInfo: authorData };
+    res.status(200).json(createHttpSuccess(documentInfo));
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const createDocument = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const createDocument = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { data, error } = await sbdb.schema('edudoc').from('documents').insert(req.body);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const deleteDocumentById = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const deleteDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb.schema('edudoc').from('documents').delete().eq('id', id);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const updateDocumentById = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const putDocumentInTrash = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb.schema('edudoc').from('documents').update({ in_trash: true }).eq('id', id);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb.schema('edudoc').from('documents').update(req.body).eq('id', id);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
 };
 
 // #endregion
@@ -49,5 +150,3 @@ export const updateFolderById = async (req: Request, res: Response) => {
 };
 
 // #endregion
-
-

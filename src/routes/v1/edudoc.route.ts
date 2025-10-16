@@ -10,7 +10,8 @@ import {
   updateDocumentById,
   createDocument,
   getFolderById,
-  deleteFolderById
+  deleteFolderById,
+  putDocumentInTrash
 } from '~/controllers/edudoc.controller';
 const router = Router();
 
@@ -22,6 +23,7 @@ router.get('/documents/:id', getDocumentById);
 router.post('/documents', createDocument);
 router.delete('/documents/:id', deleteDocumentById);
 router.put('/documents/:id', updateDocumentById);
+router.put('/documents/:id/trash', putDocumentInTrash);
 // #endregion
 
 // #region Folder APIs
