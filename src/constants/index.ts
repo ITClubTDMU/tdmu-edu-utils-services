@@ -1,4 +1,3 @@
-import { config } from "~/config";
 
 export const BUCKET_NAME = {
   WORKSPACES: 'workspaces',
@@ -6,3 +5,6 @@ export const BUCKET_NAME = {
   RSS_INFO: 'rss_info'
 };
 
+export const DB_SCHEMA = {
+  EDU_DOC: 'edudoc'
+};
