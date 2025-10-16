@@ -33,16 +33,14 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
           .eq('id', document.uploaded_by)
           .maybeSingle();
 
-        const voteInfo = {
-          up: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
-          down: voteData?.filter((vote) => vote.vote_type == -1).length || 0
+        const countInfo = {
+          view: 1111,
+          upvote: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
+          downvote: voteData?.filter((vote) => vote.vote_type == -1).length || 0,
+          download: downloadData?.length || 0
         };
 
-        const downloadInfo = {
-          total: downloadData?.length || 0
-        };
-
-        return { ...document, voteInfo, downloadInfo, authorInfo: authorData };
+        return { ...document, authorInfo: authorData, countInfo };
       })
     );
     res.status(200).json(createHttpSuccess(documents));
@@ -64,17 +62,16 @@ export const getDocumentById = async (req: Request, res: Response, next: NextFun
       .select('*')
       .eq('document_id', id);
 
-    const voteInfo = {
-      up: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
-      down: voteData?.filter((vote) => vote.vote_type == -1).length || 0
-    };
-    const downloadInfo = {
-      total: downloadData?.length || 0
+    const countInfo = {
+      view: 1111,
+      upvote: voteData?.filter((vote) => vote.vote_type == 1).length || 0,
+      downvote: voteData?.filter((vote) => vote.vote_type == -1).length || 0,
+      download: downloadData?.length || 0
     };
 
     const { data: authorData } = await sbdb.from('profiles').select('*').eq('id', data.uploaded_by).maybeSingle();
 
-    const documentInfo = { ...data, voteInfo, downloadInfo, authorInfo: authorData };
+    const documentInfo = { ...data, authorInfo: authorData, countInfo };
     res.status(200).json(createHttpSuccess(documentInfo));
   } catch (error) {
     next(error);
