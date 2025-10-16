@@ -13,7 +13,8 @@ import {
   deleteFolderById,
   putDocumentInTrash,
   voteDocumentById,
-  downVoteDocumentById
+  downVoteDocumentById,
+  downloadDocumentById
 } from '~/controllers/edudoc.controller';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 const router = Router();
@@ -41,5 +42,10 @@ router.put('/folders/:id', updateFolderById);
 // #region Document Votes APIs
 router.put('/documents/:id/upvote', authMiddleware, voteDocumentById);
 router.put('/documents/:id/downvote', authMiddleware, downVoteDocumentById);
+// #endregion
+
+
+// #region Document Download APIs
+router.post('/documents/:id/download', authMiddleware, downloadDocumentById);
 // #endregion
 export { router as edudocRouter };

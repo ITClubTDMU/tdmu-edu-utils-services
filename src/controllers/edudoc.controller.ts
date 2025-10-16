@@ -199,3 +199,27 @@ export const downVoteDocumentById = async (req: Request, res: Response, next: Ne
   }
 };
 // #endregion
+
+// #region Document Download APIs
+export const downloadDocumentById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('document_downloads')
+      .upsert(
+        {
+          document_id: id,
+          user_id: req?.user_id ?? ''
+        },
+        {
+          onConflict: 'document_id,user_id'
+        }
+      );
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.status(200).json(createHttpSuccess(data));
+  } catch (error) {
+    next(error);
+  }
+};
+// #endregion
