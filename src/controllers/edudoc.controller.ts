@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { DEFAULT_PAGINATION } from '~/config';
 import { sbdb } from '~/lib/supabase';
 import { ErrorKey } from '~/types/http';
 import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
@@ -10,7 +11,7 @@ export const edudocTest = async (req: Request, res: Response) => {
 // #region Document APIs
 export const getListDocuments = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { page = 1, pageSize = 10, keyword = '' } = req.query;
+    const { page = DEFAULT_PAGINATION.page, pageSize = DEFAULT_PAGINATION.pageSize, keyword = '' } = req.query;
     const { data, error } = await sbdb
       .schema('edudoc')
       .from('documents')
@@ -50,7 +51,16 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
         return { ...document, authorInfo: authorData, countInfo };
       })
     );
-    res.status(200).json(createHttpSuccess(documents));
+
+    const responseData = {
+      results: documents,
+      pagination: {
+        page: Number(page),
+        pageSize: Number(pageSize),
+        total: data.length
+      }
+    };
+    res.status(200).json(createHttpSuccess(responseData));
   } catch (error) {
     next(error);
   }
@@ -132,7 +142,7 @@ export const updateDocumentById = async (req: Request, res: Response, next: Next
 
 export const getDocumentInTrash = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { page = 1, pageSize = 10, keyword = '' } = req.query;
+    const { page = DEFAULT_PAGINATION.page, pageSize = DEFAULT_PAGINATION.pageSize, keyword = '' } = req.query;
     const { data, error } = await sbdb
       .schema('edudoc')
       .from('documents')
@@ -150,7 +160,15 @@ export const getDocumentInTrash = async (req: Request, res: Response, next: Next
         return { ...document, authorInfo: authorData };
       })
     );
-    res.status(200).json(createHttpSuccess(documents));
+    const responseData = {
+      results: documents,
+      pagination: {
+        page: Number(page),
+        pageSize: Number(pageSize),
+        total: data.length
+      }
+    };
+    res.status(200).json(createHttpSuccess(responseData));
   } catch (error) {
     next(error);
   }
