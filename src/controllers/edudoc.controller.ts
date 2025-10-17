@@ -130,6 +130,31 @@ export const updateDocumentById = async (req: Request, res: Response, next: Next
   }
 };
 
+export const getDocumentInTrash = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { page = 1, pageSize = 10, keyword = '' } = req.query;
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('documents')
+      .select('*')
+      .eq('in_trash', true)
+      .like('name', `%${keyword}%`);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    const documents = await Promise.all(
+      data.slice((Number(page) - 1) * Number(pageSize), Number(page) * Number(pageSize)).map(async (document) => {
+        const { data: authorData } = await sbdb
+          .from('profiles')
+          .select('*')
+          .eq('id', document.uploaded_by)
+          .maybeSingle();
+        return { ...document, authorInfo: authorData };
+      })
+    );
+    res.status(200).json(createHttpSuccess(documents));
+  } catch (error) {
+    next(error);
+  }
+};
 // #endregion
 
 // #region Folders APIs
