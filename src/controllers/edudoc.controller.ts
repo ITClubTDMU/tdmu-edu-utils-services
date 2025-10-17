@@ -48,7 +48,13 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
           download: downloadData?.length || 0
         };
 
-        return { ...document, authorInfo: authorData, countInfo };
+        const moreInfo = {
+          hasUpVote: voteData?.some((vote) => vote.vote_type == 1 && vote.user_id == req?.user_id),
+          hasDownVote: voteData?.some((vote) => vote.vote_type == -1 && vote.user_id == req?.user_id),
+          hasDownloaded: downloadData?.some((download) => download.user_id == req?.user_id)
+        };
+
+        return { ...document, authorInfo: authorData, countInfo, moreInfo };
       })
     );
 
@@ -86,9 +92,15 @@ export const getDocumentById = async (req: Request, res: Response, next: NextFun
       download: downloadData?.length || 0
     };
 
+    const moreInfo = {
+      hasUpVote: voteData?.some((vote) => vote.vote_type == 1 && vote.user_id == req?.user_id),
+      hasDownVote: voteData?.some((vote) => vote.vote_type == -1 && vote.user_id == req?.user_id),
+      hasDownloaded: downloadData?.some((download) => download.user_id == req?.user_id)
+    };
+
     const { data: authorData } = await sbdb.from('profiles').select('*').eq('id', data.uploaded_by).maybeSingle();
 
-    const documentInfo = { ...data, authorInfo: authorData, countInfo };
+    const documentInfo = { ...data, authorInfo: authorData, countInfo, moreInfo };
     res.status(200).json(createHttpSuccess(documentInfo));
   } catch (error) {
     next(error);
@@ -157,6 +169,7 @@ export const getDocumentInTrash = async (req: Request, res: Response, next: Next
           .select('*')
           .eq('id', document.uploaded_by)
           .maybeSingle();
+
         return { ...document, authorInfo: authorData };
       })
     );
