@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import path from 'path';
 import { DEFAULT_PAGINATION } from '~/config';
+import { BUCKET_NAME } from '~/constants';
 import { sbdb } from '~/lib/supabase';
 import { ErrorKey } from '~/types/http';
 import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
@@ -11,13 +13,24 @@ export const edudocTest = async (req: Request, res: Response) => {
 // #region Document APIs
 export const getListDocuments = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { page = DEFAULT_PAGINATION.page, pageSize = DEFAULT_PAGINATION.pageSize, keyword = '' } = req.query;
-    const { data, error } = await sbdb
+    const {
+      page = DEFAULT_PAGINATION.page,
+      pageSize = DEFAULT_PAGINATION.pageSize,
+      keyword = '',
+      orderBy = 'newest'
+    } = req.query;
+    const query = sbdb
       .schema('edudoc')
       .from('documents')
       .select('*')
       .eq('in_trash', false)
-      .like('name', `%${keyword}%`);
+      .ilike('name', `%${keyword}%`);
+
+    if (orderBy === 'newest') {
+      query.order('created_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
 
     if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
 
@@ -109,7 +122,33 @@ export const getDocumentById = async (req: Request, res: Response, next: NextFun
 
 export const createDocument = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { data, error } = await sbdb.schema('edudoc').from('documents').insert(req.body);
+    const file = req.file;
+    if (!file) {
+      throw createHttpErr(ErrorKey.MISSING_KEY, 'Missing "file" key');
+    }
+
+    const ext = path.extname(file.originalname);
+    const user_id = req.user_id ?? '';
+    const bucket = BUCKET_NAME.EDUDOC_DOCUMENTS;
+
+    const filePath = user_id + '/' + file.originalname;
+    const { data: fileData, error: fileError } = await sbdb.storage.from(bucket).upload(filePath, file.buffer, {
+      contentType: file.mimetype
+    });
+    if (fileError) throw createHttpErr(ErrorKey.DB_ERROR, fileError.message);
+
+    const documentData = JSON.parse(req.body.data);
+
+    const { data, error } = await sbdb
+      .schema('edudoc')
+      .from('documents')
+      .insert({
+        ...documentData,
+        uploaded_by: user_id,
+        file_url: fileData.fullPath,
+        file_size: file.size,
+        file_type: ext.replace('.', '')
+      });
     if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
     res.status(200).json(createHttpSuccess(data));
   } catch (error) {

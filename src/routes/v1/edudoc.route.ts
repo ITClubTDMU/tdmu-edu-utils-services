@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import {
   deleteDocumentById,
   createFolder,
@@ -16,18 +17,23 @@ import {
   downVoteDocumentById,
   downloadDocumentById
 } from '~/controllers/edudoc.controller';
+import multerLib from '~/lib/multer';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 const router = Router();
+
+const upload = multer({
+  storage: multerLib.storageUpload
+});
 
 router.get('/test', edudocTest);
 
 // #region Document APIs
-router.get('/documents', getListDocuments);
-router.get('/documents/:id', getDocumentById);
-router.post('/documents', createDocument);
-router.delete('/documents/:id', deleteDocumentById);
-router.put('/documents/:id', updateDocumentById);
-router.put('/documents/:id/trash', putDocumentInTrash);
+router.get('/documents', authMiddleware, getListDocuments);
+router.get('/documents/:id', authMiddleware, getDocumentById);
+router.post('/documents', authMiddleware, upload.single('file'), createDocument);
+router.delete('/documents/:id', authMiddleware, deleteDocumentById);
+router.put('/documents/:id', authMiddleware, updateDocumentById);
+router.put('/documents/:id/trash', authMiddleware, putDocumentInTrash);
 
 // #endregion
 
@@ -43,7 +49,6 @@ router.put('/folders/:id', updateFolderById);
 router.put('/documents/:id/upvote', authMiddleware, voteDocumentById);
 router.put('/documents/:id/downvote', authMiddleware, downVoteDocumentById);
 // #endregion
-
 
 // #region Document Download APIs
 router.post('/documents/:id/download', authMiddleware, downloadDocumentById);
