@@ -15,7 +15,8 @@ import {
   putDocumentInTrash,
   voteDocumentById,
   downVoteDocumentById,
-  downloadDocumentById
+  downloadDocumentById,
+  getDocumentUserBadge
 } from '~/controllers/edudoc.controller';
 import multerLib from '~/lib/multer';
 import { authMiddleware } from '~/middlewares/authMiddleware';
@@ -53,4 +54,9 @@ router.put('/documents/:id/downvote', authMiddleware, downVoteDocumentById);
 // #region Document Download APIs
 router.post('/documents/:id/download', authMiddleware, downloadDocumentById);
 // #endregion
+
+// #region Document User Badge APIs
+router.get('/user-badges', authMiddleware, getDocumentUserBadge);
+// #endregion
+
 export { router as edudocRouter };

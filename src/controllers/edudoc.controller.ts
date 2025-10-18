@@ -327,3 +327,34 @@ export const downloadDocumentById = async (req: Request, res: Response, next: Ne
   }
 };
 // #endregion
+
+// #region Document User Bage
+
+export const getDocumentUserBadge = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user_id = req.user_id!;
+    const { data, error } = await sbdb.schema('edudoc').from('user_badges').select('*').eq('user_id', user_id);
+
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+
+    const badges = await Promise.all(
+      data
+        .filter((badge) => badge.badge_id != null)
+        .map(async (badge) => {
+          const { data: badgeData } = await sbdb
+            .schema('edudoc')
+            .from('badges')
+            .select('*')
+            .eq('id', badge.badge_id!)
+            .maybeSingle();
+
+          return { user_id, earned_at: badge.earned_at, ...(badgeData ?? {}) };
+        })
+    );
+    res.status(200).json(createHttpSuccess(badges));
+  } catch (error) {
+    next(error);
+  }
+};
+
+// #endregion
