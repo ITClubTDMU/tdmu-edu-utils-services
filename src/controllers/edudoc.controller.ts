@@ -17,7 +17,8 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
       page = DEFAULT_PAGINATION.page,
       pageSize = DEFAULT_PAGINATION.pageSize,
       keyword = '',
-      orderBy = 'newest'
+      orderBy = 'newest',
+      user = 'me'
     } = req.query;
     const query = sbdb
       .schema('edudoc')
@@ -28,6 +29,10 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
 
     if (orderBy === 'newest') {
       query.order('created_at', { ascending: false });
+    }
+
+    if (user === 'me') {
+      query.eq('uploaded_by', req.user_id!);
     }
 
     const { data, error } = await query;
