@@ -3,6 +3,7 @@ import path from 'path';
 import { DEFAULT_PAGINATION } from '~/config';
 import { BUCKET_NAME } from '~/constants';
 import { sbdb } from '~/lib/supabase';
+import { TFolder } from '~/types/edudoc';
 import { ErrorKey } from '~/types/http';
 import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 
@@ -233,8 +234,81 @@ export const getDocumentInTrash = async (req: Request, res: Response, next: Next
 // #endregion
 
 // #region Folders APIs
-export const getListFolders = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Hello World' });
+export const getListFolders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { user } = req.params;
+
+    const query = sbdb.schema('edudoc').from('folders').select('*');
+    if (user === 'me') {
+      query.eq('created_by', req.user_id!);
+    }
+    const { data, error } = await query;
+
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+
+    const initialResult: any = {};
+
+    function formatKey(folder: TFolder) {
+      return `${folder.id}@#@${folder.name}`;
+    }
+
+    const mappingFolder = data.reduce(
+      (acc, folder) => {
+        const parentId = folder.parent_id;
+        acc[folder.id] = folder;
+
+        if (!initialResult[folder.id]) initialResult[folder.id] = [];
+
+        if (parentId) {
+          if (!initialResult[parentId]) initialResult[parentId] = [];
+          initialResult[parentId].push(folder.id);
+        }
+
+        return acc;
+      },
+      {} as {
+        [key: string]: TFolder;
+      }
+    );
+
+    const results: any = [];
+
+    const isVisited: any = {};
+    async function dfs(curId: string) {
+      if (isVisited[curId]) return;
+
+      isVisited[curId] = true;
+      const arr: any = [formatKey(mappingFolder[curId])];
+      for (const childId of initialResult[curId]) {
+        if (!isVisited[childId]) {
+          const childResult = await dfs(childId);
+          arr.push(childResult);
+        }
+      }
+
+      const { data: documentData, error: documentError } = await sbdb
+        .schema('edudoc')
+        .from('documents')
+        .select('*')
+        .eq('folder_id', curId);
+
+      if (!documentError) {
+        arr.push(...documentData.map((document) => `${document.id}@#@${document.name}.` + document.file_type));
+      }
+      return arr;
+    }
+
+    for (const folderKey of Object.keys(initialResult)) {
+      const actualFolder = mappingFolder[folderKey];
+      if (actualFolder && actualFolder.parent_id === null) {
+        results.push(await dfs(folderKey));
+      }
+    }
+
+    res.status(200).json(createHttpSuccess(results));
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getFolderById = async (req: Request, res: Response) => {
