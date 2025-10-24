@@ -7,6 +7,7 @@ import { timeTableRouter } from './timeTableRoute';
 import { workspaceRouter } from './workspaceRoute';
 import { mapRouter } from './map.route';
 import { newsRouter } from './news.route';
+import { edudocRouter } from './edudoc.route';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.use('/workspace', workspaceRouter);
 router.use('/workspaces', workspaceRouter);
 router.use('/map', mapRouter);
 router.use('/news', newsRouter);
-
+router.use('/edudoc', edudocRouter);
 router.get('/test2', authMiddleware, (req, res) => {
   res.status(200).json({ message: 'Hello World' });
 });

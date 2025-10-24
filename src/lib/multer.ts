@@ -18,7 +18,7 @@ function getUniqueFileName(folderPath: string, baseName: string, ext: string): s
 
 const storageUpload = multer.diskStorage({
   destination: (req, file, cb) => {
-    const userId = req.params.userId; // Lấy từ URL param
+    const userId = req.params.userId || req.user_id; // Lấy từ URL param
 
     if (!userId) {
       return cb(new Error('Missing user_id'), '');
@@ -31,7 +31,7 @@ const storageUpload = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: (req: any, file: any, cb: any) => {
-    const userId = req.params.userId;
+    const userId = req.params.userId || req.user_id;
     const ext = path.extname(file.originalname);
     const baseName = path.basename(file.originalname, ext); // giữ nguyên tên gốc
 

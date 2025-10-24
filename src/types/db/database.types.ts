@@ -12,6 +12,443 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
+  edudoc: {
+    Tables: {
+      badges: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          tier: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          tier?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          tier?: string | null
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          document_id: string | null
+          id: string
+          parent_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          parent_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          parent_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments_votes: {
+        Row: {
+          comment_id: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+          vote_type: number
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          vote_type: number
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          vote_type?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_votes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_downloads: {
+        Row: {
+          document_id: string
+          download_at: string | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          document_id: string
+          download_at?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          document_id?: string
+          download_at?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_downloads_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_tags: {
+        Row: {
+          document_id: string | null
+          id: string
+          tag_id: string | null
+        }
+        Insert: {
+          document_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Update: {
+          document_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_tags_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_views: {
+        Row: {
+          document_id: string
+          id: number
+          user_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          document_id: string
+          id?: number
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          document_id?: string
+          id?: number
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_views_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          file_size: number
+          file_type: string | null
+          file_url: string
+          folder_id: string | null
+          id: string
+          in_trash: boolean | null
+          is_public: boolean | null
+          name: string
+          summary: string | null
+          updated_at: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          file_size: number
+          file_type?: string | null
+          file_url: string
+          folder_id?: string | null
+          id?: string
+          in_trash?: boolean | null
+          is_public?: boolean | null
+          name: string
+          summary?: string | null
+          updated_at?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          file_size?: number
+          file_type?: string | null
+          file_url?: string
+          folder_id?: string | null
+          id?: string
+          in_trash?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          summary?: string | null
+          updated_at?: string | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents_votes: {
+        Row: {
+          created_at: string | null
+          document_id: string
+          id: string
+          updated_at: string | null
+          user_id: string
+          vote_type: number
+        }
+        Insert: {
+          created_at?: string | null
+          document_id: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          vote_type: number
+        }
+        Update: {
+          created_at?: string | null
+          document_id?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          vote_type?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_votes_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string | null
+          document_id: string | null
+          from_user: string | null
+          id: string
+          message: string | null
+          to_user: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          document_id?: string | null
+          from_user?: string | null
+          id?: string
+          message?: string | null
+          to_user?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          document_id?: string | null
+          from_user?: string | null
+          id?: string
+          message?: string | null
+          to_user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folders: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          in_trash: boolean | null
+          name: string
+          parent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          in_trash?: boolean | null
+          name: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          in_trash?: boolean | null
+          name?: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          count: number | null
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string | null
+          earned_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          badge_id?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          badge_id?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       categories: {
@@ -476,24 +913,6 @@ export type Database = {
           },
         ]
       }
-      users: {
-        Row: {
-          email: string
-          id: string
-          name: string
-        }
-        Insert: {
-          email: string
-          id: string
-          name: string
-        }
-        Update: {
-          email?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
       variables: {
         Row: {
           created_at: string | null
@@ -624,7 +1043,7 @@ export type Database = {
       }
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: string
+        Returns: unknown
       }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
@@ -801,6 +1220,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  edudoc: {
+    Enums: {},
+  },
   public: {
     Enums: {
       category_type: ["global", "user"],
