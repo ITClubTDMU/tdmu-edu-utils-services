@@ -8,6 +8,7 @@ import { workspaceRouter } from './workspaceRoute';
 import { mapRouter } from './map.route';
 import { newsRouter } from './news.route';
 import { edudocRouter } from './edudoc.route';
+import { workflowRouter } from './workflow.route';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use('/workspaces', workspaceRouter);
 router.use('/map', mapRouter);
 router.use('/news', newsRouter);
 router.use('/edudoc', edudocRouter);
+router.use('/workflow', authMiddleware, workflowRouter);
 router.get('/test2', authMiddleware, (req, res) => {
   res.status(200).json({ message: 'Hello World' });
 });
