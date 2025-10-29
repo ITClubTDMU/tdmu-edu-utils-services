@@ -226,6 +226,7 @@ export type Database = {
           is_public: boolean | null
           name: string
           summary: string | null
+          tags: string | null
           updated_at: string | null
           uploaded_by: string
         }
@@ -242,6 +243,7 @@ export type Database = {
           is_public?: boolean | null
           name: string
           summary?: string | null
+          tags?: string | null
           updated_at?: string | null
           uploaded_by: string
         }
@@ -258,6 +260,7 @@ export type Database = {
           is_public?: boolean | null
           name?: string
           summary?: string | null
+          tags?: string | null
           updated_at?: string | null
           uploaded_by?: string
         }
@@ -960,6 +963,216 @@ export type Database = {
           },
         ]
       }
+      workflow_conditions: {
+        Row: {
+          compare_value: string
+          created_at: string | null
+          description: string | null
+          field_name: string
+          id: string
+          logic: string
+          step_number: number
+          workflow_id: string
+        }
+        Insert: {
+          compare_value: string
+          created_at?: string | null
+          description?: string | null
+          field_name: string
+          id?: string
+          logic: string
+          step_number: number
+          workflow_id: string
+        }
+        Update: {
+          compare_value?: string
+          created_at?: string | null
+          description?: string | null
+          field_name?: string
+          id?: string
+          logic?: string
+          step_number?: number
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_conditions_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_info: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          step_count: number
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          step_count?: number
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          step_count?: number
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      workflow_instance_history: {
+        Row: {
+          action: string
+          action_by: string | null
+          actor_role: string
+          comment: string | null
+          created_at: string | null
+          id: string
+          instance_id: string
+          step_number: number
+        }
+        Insert: {
+          action: string
+          action_by?: string | null
+          actor_role: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          instance_id: string
+          step_number: number
+        }
+        Update: {
+          action?: string
+          action_by?: string | null
+          actor_role?: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          instance_id?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instance_history_instance_id_fkey"
+            columns: ["instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_instances: {
+        Row: {
+          created_at: string | null
+          current_step: number
+          form_data: Json | null
+          id: string
+          status: Database["public"]["Enums"]["workflow_status"] | null
+          updated_at: string | null
+          user_id: string
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_step?: number
+          form_data?: Json | null
+          id?: string
+          status?: Database["public"]["Enums"]["workflow_status"] | null
+          updated_at?: string | null
+          user_id: string
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_step?: number
+          form_data?: Json | null
+          id?: string
+          status?: Database["public"]["Enums"]["workflow_status"] | null
+          updated_at?: string | null
+          user_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_steps: {
+        Row: {
+          actions: Json | null
+          created_at: string | null
+          description: string | null
+          handler_ref: string | null
+          handler_type: string | null
+          id: string
+          is_end: boolean | null
+          status: Database["public"]["Enums"]["workflow_status"] | null
+          step_number: number
+          type: string
+          workflow_id: string
+        }
+        Insert: {
+          actions?: Json | null
+          created_at?: string | null
+          description?: string | null
+          handler_ref?: string | null
+          handler_type?: string | null
+          id?: string
+          is_end?: boolean | null
+          status?: Database["public"]["Enums"]["workflow_status"] | null
+          step_number: number
+          type: string
+          workflow_id: string
+        }
+        Update: {
+          actions?: Json | null
+          created_at?: string | null
+          description?: string | null
+          handler_ref?: string | null
+          handler_type?: string | null
+          id?: string
+          is_end?: boolean | null
+          status?: Database["public"]["Enums"]["workflow_status"] | null
+          step_number?: number
+          type?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_steps_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -989,62 +1202,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
-      }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
@@ -1054,47 +1211,20 @@ export type Database = {
           similarity: number
         }[]
       }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
     }
     Enums: {
       category_type: "global" | "user"
       doc_category: "default" | "văn bản"
       fb_post_type: "training_point" | "event" | "other"
+      workflow_handler_type: "AUTHOR" | "GROUP" | "USER" | "CHOOSE_USER"
+      workflow_status:
+        | "receive"
+        | "create"
+        | "complete"
+        | "aligning"
+        | "wait_receive"
+        | "in_progress"
+        | "reject"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1228,6 +1358,16 @@ export const Constants = {
       category_type: ["global", "user"],
       doc_category: ["default", "văn bản"],
       fb_post_type: ["training_point", "event", "other"],
+      workflow_handler_type: ["AUTHOR", "GROUP", "USER", "CHOOSE_USER"],
+      workflow_status: [
+        "receive",
+        "create",
+        "complete",
+        "aligning",
+        "wait_receive",
+        "in_progress",
+        "reject",
+      ],
     },
   },
 } as const
