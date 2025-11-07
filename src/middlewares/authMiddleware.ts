@@ -21,11 +21,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = authHeader.split(' ')[1];
     const decoded = await sb.verifySupabaseJWT(token);
 
-    console.log('userId ', decoded.sub);
-
-    req.user = undefined;
-
-    req.user_id = decoded.sub ?? '63d096e7-f493-4c0d-b138-3b13e24cfdd7';
+    // console.log('decoded: ', decoded);
+    req.user = decoded;
+    req.user_id = decoded.sub;
     next();
   } catch (error) {
     console.error('authMiddleware error: ', error);

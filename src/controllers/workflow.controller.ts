@@ -370,3 +370,88 @@ export async function getWorkflowInstancesByMe(req: Request, res: Response, next
     next(err);
   }
 }
+
+export async function getWorkflowWithStepsByWorkflowId(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { workflowId: workflow_id } = req.params;
+    const { page = 1, limit = 20, searchTerm = '', status } = req.query;
+
+    const workflowWithStepsQuery = sbdb
+      .from('workflow_info')
+      .select(
+        `
+      *,
+      steps:workflow_steps!workflow_id (
+        id:step_id,
+        step_number,
+        handler_type,
+        handler_ref,
+        is_end,
+        status,
+        type
+      )
+    `
+      )
+      // .eq('workflow_id', workflow_id)
+      .limit(20);
+
+    type WorkflowWithSteps = QueryData<typeof workflowWithStepsQuery>;
+    const { data: workflowWithStepsData, error: workflowWithStepsError } = await workflowWithStepsQuery;
+    if (workflowWithStepsError) throw createHttpErr(ErrorKey.DB_ERROR, workflowWithStepsError.message);
+
+    res.json(createHttpSuccess(workflowWithStepsData));
+  } catch (err) {
+    next(err);
+  }
+}
+export async function updateWorkflowStep(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id: step_id } = req.params;
+    const { handler_type, handler_ref, is_end, status, type, description, step_number, actions } = req.body;
+    console.log('step_id', is_end);
+    const { error } = await sbdb
+      .from('workflow_steps')
+      .update({ handler_type, handler_ref, is_end, status, type, description, step_number, actions })
+      .eq('id', step_id);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.json(createHttpSuccess({ message: 'Workflow step updated successfully' }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createNewWorkflow(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { name, description, type } = req.body;
+    const { error } = await sbdb.from('workflow_info').insert({ name, description, step_count: 0, type });
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.json(createHttpSuccess({ message: 'Workflow created successfully' }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createWorkflowStep(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { workflowId: workflow_id } = req.params;
+    const { step_number, handler_type, handler_ref, is_end, status, type, description, actions } = req.body;
+    const { error } = await sbdb
+      .from('workflow_steps')
+      .insert({ workflow_id, step_number, handler_type, handler_ref, is_end, status, type, description, actions });
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.json(createHttpSuccess({ message: 'Workflow step created successfully' }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteWorkflowStep(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id: step_id } = req.params;
+    const { error } = await sbdb.from('workflow_steps').delete().eq('id', step_id);
+    if (error) throw createHttpErr(ErrorKey.DB_ERROR, error.message);
+    res.json(createHttpSuccess({ message: 'Workflow step deleted successfully' }));
+  } catch (err) {
+    next(err);
+  }
+}

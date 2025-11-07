@@ -9,7 +9,7 @@ import { mapRouter } from './map.route';
 import { newsRouter } from './news.route';
 import { edudocRouter } from './edudoc.route';
 import { workflowRouter } from './workflow.route';
-
+import { userRouter } from './user.route';
 const router = Router();
 
 router.use('/dkmh', checkDkmhToken, dkmhRouter);
@@ -21,6 +21,7 @@ router.use('/map', mapRouter);
 router.use('/news', newsRouter);
 router.use('/edudoc', edudocRouter);
 router.use('/workflow', authMiddleware, workflowRouter);
+router.use('/users', userRouter);
 router.get('/test2', authMiddleware, (req, res) => {
   res.status(200).json({ message: 'Hello World' });
 });

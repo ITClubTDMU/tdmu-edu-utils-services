@@ -13,9 +13,19 @@ import {
   deleteProject,
   updateWorkspace,
   deleteWorkspace,
-  downloadProject
+  downloadProject,
+  updateProjectName
 } from '~/controllers/workspaceController';
-import { applyVars, createVar, deleteVar, deleteVars, getVars, updateVar, updateVars } from '~/controllers/varrController';
+import {
+  applyVars,
+  createVar,
+  deleteVar,
+  deleteVars,
+  getVars,
+  getWorkspaceById,
+  updateVar,
+  updateVars
+} from '~/controllers/varrController';
 
 const router = Router();
 
@@ -32,7 +42,8 @@ router.post('/create-project', upload.single('file'), createProject);
 router.get('/:workspace_id/projects', getProjects);
 router.get('/:workspace_id/projects/:project_id', getProject);
 router.delete('/:workspace_id/projects/:project_id', deleteProject);
-  
+router.put('/:workspace_id/projects/:project_id', updateProjectName);
+
 router.post('/upload', upload.single('file'), uploadFile1);
 router.put('/file', upload.single('file'), updateFile);
 router.delete('/delete', deleteFile);
@@ -43,6 +54,7 @@ const varsRouter = Router();
 // varsRouter.put('/:var_id', updateVar);
 // varsRouter.delete('/:var_id', deleteVar);
 
+router.get('/:id', getWorkspaceById);
 router.get('/:workspace_id/projects/:project_id/vars', getVars);
 router.delete('/:workspace_id/projects/:project_id/vars/:var_id', deleteVar);
 router.put('/:workspace_id/projects/:project_id/vars/:var_id', updateVar);

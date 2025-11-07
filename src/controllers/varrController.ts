@@ -1,9 +1,24 @@
 import { NextFunction, Request, Response } from 'express';
 import { sbdb } from '~/lib/supabase';
-import { createHttpSuccess } from '~/utils/createHttpResponse';
+import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 import { TProject } from '~/types/workspace';
 import { BUCKET_NAME } from '~/constants';
 import { docxToPdf, modifyDocxWithVars } from '~/utils/file';
+import { ErrorKey } from '~/types/http';
+
+
+export async function getWorkspaceById(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id } = req.params;
+    console.log('id: ', id);
+    const { data, error } = await sbdb.from('workspaces').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    if (data == null) throw createHttpErr(ErrorKey.NOT_FOUND, 'Workspace not found');
+    res.json(createHttpSuccess(data));
+  } catch (err) {
+    next(err);
+  }
+}
 
 export async function getVars(req: Request, res: Response, next: NextFunction) {
   try {
@@ -84,6 +99,7 @@ export async function applyVars(req: Request, res: Response, next: NextFunction)
   try {
     const { project_id } = req.params;
     const { data, error } = await sbdb.from('projects').select('*').eq('id', project_id).limit(1);
+
     if (error) throw error;
     if (data.length === 0) throw new Error('Project not found');
     const project = data[0] as TProject;
@@ -94,6 +110,7 @@ export async function applyVars(req: Request, res: Response, next: NextFunction)
       sbdb.storage.from(BUCKET_NAME.WORKSPACES).download(pathOrigin),
       sbdb.from('variables').select('*').eq('project_id', project_id)
     ]);
+    console.log('data111: ', vars);
     if (fileOriginError) throw fileOriginError;
     if (varsError) throw varsError;
 

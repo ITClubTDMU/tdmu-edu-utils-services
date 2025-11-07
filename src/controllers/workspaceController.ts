@@ -19,8 +19,9 @@ export async function getWorkspaces(req: Request, res: Response, next: NextFunct
 export async function getWorkspace(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
-    const { data, error } = await sbdb.from('workspaces').select('*').eq('id', id);
+    const { data, error } = await sbdb.from('workspaces').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
+    if (data == null) throw createHttpErr(ErrorKey.NOT_FOUND, 'Workspace not found');
     res.json(createHttpSuccess(data));
   } catch (err) {
     next(err);
@@ -285,6 +286,22 @@ export async function updateFile(req: Request, res: Response, next: NextFunction
     if (error) throw error;
 
     res.json(createHttpSuccess({ success: true }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateProjectName(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { workspace_id, project_id } = req.params;
+    const { name } = req.body;
+    const { error } = await sbdb
+      .from('projects')
+      .update({ name })
+      .eq('workspace_id', workspace_id)
+      .eq('id', project_id);
+    if (error) throw error;
+    res.json(createHttpSuccess({ name, project_id }));
   } catch (err) {
     next(err);
   }
