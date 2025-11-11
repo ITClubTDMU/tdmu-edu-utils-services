@@ -71,13 +71,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "comments_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "comments_parent_id_fkey"
             columns: ["parent_id"]
             isOneToOne: false
@@ -140,15 +133,7 @@ export type Database = {
           id?: number
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "document_downloads_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       document_tags: {
         Row: {
@@ -167,13 +152,6 @@ export type Database = {
           tag_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "document_tags_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "document_tags_tag_id_fkey"
             columns: ["tag_id"]
@@ -202,15 +180,7 @@ export type Database = {
           user_id?: string | null
           viewed_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "document_views_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       documents: {
         Row: {
@@ -228,7 +198,7 @@ export type Database = {
           summary: string | null
           tags: string | null
           updated_at: string | null
-          uploaded_by: string
+          uploaded_by: string | null
         }
         Insert: {
           created_at?: string | null
@@ -245,7 +215,7 @@ export type Database = {
           summary?: string | null
           tags?: string | null
           updated_at?: string | null
-          uploaded_by: string
+          uploaded_by?: string | null
         }
         Update: {
           created_at?: string | null
@@ -262,7 +232,7 @@ export type Database = {
           summary?: string | null
           tags?: string | null
           updated_at?: string | null
-          uploaded_by?: string
+          uploaded_by?: string | null
         }
         Relationships: [
           {
@@ -299,15 +269,7 @@ export type Database = {
           user_id?: string
           vote_type?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "documents_votes_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       donations: {
         Row: {
@@ -337,15 +299,7 @@ export type Database = {
           message?: string | null
           to_user?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "donations_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       folders: {
         Row: {
@@ -651,6 +605,42 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      profiles_rss_favorites: {
+        Row: {
+          created_at: string
+          profile_short_name: string
+          status: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          profile_short_name: string
+          status?: boolean | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          profile_short_name?: string
+          status?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_rss_favorites_profile_short_name_fkey"
+            columns: ["profile_short_name"]
+            isOneToOne: false
+            referencedRelation: "rss_profiles"
+            referencedColumns: ["short_name"]
+          },
+          {
+            foreignKeyName: "profiles_rss_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
