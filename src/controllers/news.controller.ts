@@ -9,12 +9,8 @@ import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 
 export async function getNewsFeed(req: Request, res: Response, next: NextFunction) {
   try {
-    const { dateRange, type } = req.body;
-    const query = sbdb
-      .from('facebook_posts')
-      .select('*')
-      .eq('type', type ?? 'other')
-      .order('converted_time', { ascending: false });
+    const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false } = req.body;
+    const query = sbdb.from('facebook_posts').select('*');
 
     if (dateRange.from) {
       query.gte('converted_time', dateRange.from);
@@ -22,6 +18,24 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
     if (dateRange.to) {
       query.lte('converted_time', dateRange.to);
     }
+
+    if (searchQuery) {
+      query.textSearch('title', searchQuery);
+      query.textSearch('content', searchQuery);
+    }
+
+    if (isShownFavoriteOnly) {
+      const { data: favoriteProfilesData } = await sbdb
+        .from('profiles_rss_favorites')
+        .select('*')
+        .eq('user_id', req.user_id ?? '')
+        .eq('status', true);
+      if (favoriteProfilesData) {
+        query.in('short_name', favoriteProfilesData.map((item) => item.profile_short_name) ?? []);
+      }
+    }
+
+    query.eq('type', type ?? 'other').order('converted_time', { ascending: false });
 
     const { data, error } = await query;
     if (error) {
@@ -69,7 +83,7 @@ export async function getPageProfiles(req: Request, res: Response, next: NextFun
 
 export async function getPostImages(req: Request, res: Response, next: NextFunction) {
   try {
-    const { post_id } = req.body;
+    const { post_id } = req.params;
     const path = `posts/${post_id}`;
     const { data, error } = await sbdb.storage.from(BUCKET_NAME.RSS_INFO).list(path);
     if (error) {
@@ -77,7 +91,7 @@ export async function getPostImages(req: Request, res: Response, next: NextFunct
     }
 
     const prefixImgUrl = config.prefixPublicStoragePath + '/' + BUCKET_NAME.RSS_INFO + '/' + path + '/';
-
+    console.log(prefixImgUrl);
     res.json(createHttpSuccess(data.map((item) => prefixImgUrl + item.name)));
   } catch (err) {
     next(err);
