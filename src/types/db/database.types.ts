@@ -458,46 +458,58 @@ export type Database = {
       }
       facebook_posts: {
         Row: {
-          content: string | null
+          content: string
           converted_time: string | null
           created_at: string
           id: number
           images: string | null
-          is_hot_news: boolean
+          is_hot_news: boolean | null
+          is_pinned: boolean | null
+          original_time: string | null
           page_name: string | null
-          short_name: string | null
-          time: string | null
-          title: string | null
-          type: Database["public"]["Enums"]["fb_post_type"] | null
-          url: string | null
+          short_name: string
+          source_from: string
+          summarization: string | null
+          tags: string[] | null
+          title: string
+          url: string
+          uuid: string | null
         }
         Insert: {
-          content?: string | null
+          content: string
           converted_time?: string | null
           created_at?: string
           id?: number
           images?: string | null
-          is_hot_news?: boolean
+          is_hot_news?: boolean | null
+          is_pinned?: boolean | null
+          original_time?: string | null
           page_name?: string | null
-          short_name?: string | null
-          time?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["fb_post_type"] | null
-          url?: string | null
+          short_name: string
+          source_from?: string
+          summarization?: string | null
+          tags?: string[] | null
+          title?: string
+          url: string
+          uuid?: string | null
         }
         Update: {
-          content?: string | null
+          content?: string
           converted_time?: string | null
           created_at?: string
           id?: number
           images?: string | null
-          is_hot_news?: boolean
+          is_hot_news?: boolean | null
+          is_pinned?: boolean | null
+          original_time?: string | null
           page_name?: string | null
-          short_name?: string | null
-          time?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["fb_post_type"] | null
-          url?: string | null
+          short_name?: string
+          source_from?: string
+          summarization?: string | null
+          tags?: string[] | null
+          title?: string
+          url?: string
+          uuid?: string | null
         }
         Relationships: []
       }
@@ -707,6 +719,30 @@ export type Database = {
           name?: string | null
           short_name?: string
           url?: string | null
+        }
+        Relationships: []
+      }
+      scraped_post_tags: {
+        Row: {
+          created_at: string
+          id: number
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1192,6 +1228,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      f_unaccent: { Args: { "": string }; Returns: string }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
@@ -1201,11 +1238,13 @@ export type Database = {
           similarity: number
         }[]
       }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       category_type: "global" | "user"
       doc_category: "default" | "văn bản"
       fb_post_type: "training_point" | "event" | "other"
+      scraping_source_from: "facebook" | "tdmu.edu.vn"
       workflow_handler_type: "AUTHOR" | "GROUP" | "USER" | "CHOOSE_USER"
       workflow_status:
         | "receive"
@@ -1348,6 +1387,7 @@ export const Constants = {
       category_type: ["global", "user"],
       doc_category: ["default", "văn bản"],
       fb_post_type: ["training_point", "event", "other"],
+      scraping_source_from: ["facebook", "tdmu.edu.vn"],
       workflow_handler_type: ["AUTHOR", "GROUP", "USER", "CHOOSE_USER"],
       workflow_status: [
         "receive",

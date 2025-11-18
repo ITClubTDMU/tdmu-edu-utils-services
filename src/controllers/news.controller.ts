@@ -20,8 +20,13 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
     }
 
     if (searchQuery) {
-      query.textSearch('title', searchQuery);
-      query.textSearch('content', searchQuery);
+      const safeQuery = searchQuery.replaceAll(',', String.raw`\,`);
+      console.log('searchQuery', safeQuery);
+      const q = `"%${searchQuery}%"`;
+
+      query.or([`title.ilike.${q}`, `content.ilike.${q}`, `summarization.ilike.${q}`].join(','));
+
+      // query.or(`title.ilike.%${safeQuery}%,content.ilike.%${safeQuery}%,`);
     }
 
     if (isShownFavoriteOnly) {
@@ -35,7 +40,11 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
       }
     }
 
-    query.eq('type', type ?? 'other').order('converted_time', { ascending: false });
+    query.overlaps(
+      'tags',
+      type.split(',').map((item: string) => item.toLowerCase().trim())
+    );
+    query.order('converted_time', { ascending: false });
 
     const { data, error } = await query;
     if (error) {
@@ -171,6 +180,18 @@ export async function removeFavoriteProfile(req: Request, res: Response, next: N
       .update({ status: false })
       .eq('user_id', user_id)
       .eq('profile_short_name', profileShortName);
+    if (error) {
+      throw createHttpErr(ErrorKey.DB_ERROR, JSON.stringify(error));
+    }
+    res.json(createHttpSuccess(data ?? []));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getTagsNews(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { data, error } = await sbdb.from('scraped_post_tags').select('*');
     if (error) {
       throw createHttpErr(ErrorKey.DB_ERROR, JSON.stringify(error));
     }
