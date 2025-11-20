@@ -9,14 +9,20 @@ import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 
 export async function getNewsFeed(req: Request, res: Response, next: NextFunction) {
   try {
-    const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false } = req.body;
+    const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false, lastDateTime = '', limit = 20 } = req.body;
     const query = sbdb.from('facebook_posts').select('*');
+    query.order('converted_time', { ascending: false });
 
     if (dateRange.from) {
       query.gte('converted_time', dateRange.from);
     }
     if (dateRange.to) {
-      query.lte('converted_time', dateRange.to);
+      query.lt('converted_time', dateRange.to);
+    }
+
+    if (lastDateTime) {
+      const date = new Date(lastDateTime);
+      query.lt('converted_time', date.toISOString());
     }
 
     if (searchQuery) {
@@ -40,12 +46,14 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
       }
     }
 
-    query.overlaps(
-      'tags',
-      type.split(',').map((item: string) => item.toLowerCase().trim())
-    );
-    query.order('converted_time', { ascending: false });
+    if (type && !type.includes('all')) {
+      query.overlaps(
+        'tags',
+        type.split(',').map((item: string) => item.toLowerCase().trim())
+      );
+    }
 
+    query.limit(5);
     const { data, error } = await query;
     if (error) {
       throw createHttpErr(ErrorKey.DB_ERROR, JSON.stringify(error));
