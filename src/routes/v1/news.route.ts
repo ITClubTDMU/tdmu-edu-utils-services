@@ -7,13 +7,15 @@ import {
   getFavoriteProfiles,
   addFavoriteProfile,
   removeFavoriteProfile,
-  getTagsNews
+  getTagsNews,
+  getPinnedNews
 } from '~/controllers/news.controller';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 
 const router = Router();
 
 router.post('/', getNewsFeed);
+router.get('/pinned', getPinnedNews);
 router.post('/with-favorite', authMiddleware, getNewsFeed);
 router.get('/page-profiles', getPageProfiles);
 router.get('/tags', getTagsNews);

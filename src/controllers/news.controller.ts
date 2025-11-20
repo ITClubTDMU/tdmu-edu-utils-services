@@ -12,7 +12,7 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
     const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false, lastDateTime = '', limit = 20 } = req.body;
     const query = sbdb.from('facebook_posts').select('*');
     query.order('converted_time', { ascending: false });
-
+    query.eq('is_pinned', false);
     if (dateRange.from) {
       query.gte('converted_time', dateRange.from);
     }
@@ -200,6 +200,32 @@ export async function removeFavoriteProfile(req: Request, res: Response, next: N
 export async function getTagsNews(req: Request, res: Response, next: NextFunction) {
   try {
     const { data, error } = await sbdb.from('scraped_post_tags').select('*');
+    if (error) {
+      throw createHttpErr(ErrorKey.DB_ERROR, JSON.stringify(error));
+    }
+    res.json(createHttpSuccess(data ?? []));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getPinnedNews(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { data, error } = await sbdb
+      .from('facebook_posts')
+      .select(
+        `*,
+        
+        page_info:rss_profiles!short_name (
+          short_name,
+          name,
+          avatar,
+          url
+        )
+        `
+      )
+      .eq('is_pinned', true)
+      .order('converted_time', { ascending: false });
     if (error) {
       throw createHttpErr(ErrorKey.DB_ERROR, JSON.stringify(error));
     }

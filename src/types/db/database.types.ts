@@ -472,6 +472,7 @@ export type Database = {
           summarization: string | null
           tags: string[] | null
           title: string
+          updated_at: string | null
           url: string
           uuid: string | null
         }
@@ -490,6 +491,7 @@ export type Database = {
           summarization?: string | null
           tags?: string[] | null
           title?: string
+          updated_at?: string | null
           url: string
           uuid?: string | null
         }
@@ -508,6 +510,7 @@ export type Database = {
           summarization?: string | null
           tags?: string[] | null
           title?: string
+          updated_at?: string | null
           url?: string
           uuid?: string | null
         }
@@ -704,20 +707,29 @@ export type Database = {
       rss_profiles: {
         Row: {
           avatar: string | null
+          created_at: string | null
           name: string | null
           short_name: string
+          source_from: string | null
+          updated_at: string | null
           url: string | null
         }
         Insert: {
           avatar?: string | null
+          created_at?: string | null
           name?: string | null
           short_name: string
+          source_from?: string | null
+          updated_at?: string | null
           url?: string | null
         }
         Update: {
           avatar?: string | null
+          created_at?: string | null
           name?: string | null
           short_name?: string
+          source_from?: string | null
+          updated_at?: string | null
           url?: string | null
         }
         Relationships: []
