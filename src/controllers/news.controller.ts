@@ -12,7 +12,7 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
   try {
     const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false, lastDateTime = '', limit = 20 } = req.body;
     const query = sbdb.from('facebook_posts').select('*');
-    console.log(type);
+
     query.order('converted_time', { ascending: false });
     query.eq('is_pinned', false);
     if (dateRange.from) {
@@ -23,7 +23,9 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
     }
 
     // check 7 days  to now
-    const sevenDaysAgo = dayjs().subtract(14, 'day').toISOString();
+    // set hour and minute to 0
+    const sevenDaysAgo = dayjs().subtract(14, 'day').startOf('day').toISOString();
+    console.log(sevenDaysAgo);
     query.gte('converted_time', sevenDaysAgo);
     if (lastDateTime) {
       const date = new Date(lastDateTime);
