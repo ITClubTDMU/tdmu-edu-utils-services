@@ -1,4 +1,5 @@
 import { QueryData } from '@supabase/supabase-js';
+import dayjs from 'dayjs';
 import { NextFunction, Request, Response } from 'express';
 import { config } from '~/config';
 import { BUCKET_NAME } from '~/constants';
@@ -11,6 +12,7 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
   try {
     const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false, lastDateTime = '', limit = 20 } = req.body;
     const query = sbdb.from('facebook_posts').select('*');
+    console.log(type);
     query.order('converted_time', { ascending: false });
     query.eq('is_pinned', false);
     if (dateRange.from) {
@@ -20,6 +22,9 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
       query.lt('converted_time', dateRange.to);
     }
 
+    // check 7 days  to now
+    const sevenDaysAgo = dayjs().subtract(14, 'day').toISOString();
+    query.gte('converted_time', sevenDaysAgo);
     if (lastDateTime) {
       const date = new Date(lastDateTime);
       query.lt('converted_time', date.toISOString());
@@ -49,7 +54,10 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
     if (type && !type.includes('all')) {
       query.overlaps(
         'tags',
-        type.split(',').map((item: string) => item.toLowerCase().trim())
+        type
+          .split(',')
+          .map((item: string) => item.toLowerCase().trim())
+          .filter((item: string) => item)
       );
     }
 
