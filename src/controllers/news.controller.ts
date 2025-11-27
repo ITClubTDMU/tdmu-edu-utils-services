@@ -11,7 +11,10 @@ import { createHttpErr, createHttpSuccess } from '~/utils/createHttpResponse';
 export async function getNewsFeed(req: Request, res: Response, next: NextFunction) {
   try {
     const { dateRange, type, searchQuery = '', isShownFavoriteOnly = false, lastDateTime = '', limit = 20 } = req.body;
-    const query = sbdb.from('facebook_posts').select('*');
+    // join wwith rss_profiles
+    const query = sbdb
+      .from('facebook_posts')
+      .select('*, page_info:rss_profiles!short_name (short_name, name, avatar, url)');
 
     query.order('converted_time', { ascending: false });
     query.eq('is_pinned', false);
@@ -22,10 +25,10 @@ export async function getNewsFeed(req: Request, res: Response, next: NextFunctio
       query.lt('converted_time', dateRange.to);
     }
 
-    // check 7 days  to now
+    // check 7 days  to now 
     // set hour and minute to 0
-    const sevenDaysAgo = dayjs().subtract(14, 'day').startOf('day').toISOString();
-    console.log(sevenDaysAgo);
+    const sevenDaysAgo = dayjs().subtract(13, 'day').startOf('day').toISOString();
+    console.log();
     query.gte('converted_time', sevenDaysAgo);
     if (lastDateTime) {
       const date = new Date(lastDateTime);
