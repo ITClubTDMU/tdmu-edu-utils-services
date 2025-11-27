@@ -71,13 +71,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "comments_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "comments_parent_id_fkey"
             columns: ["parent_id"]
             isOneToOne: false
@@ -140,15 +133,7 @@ export type Database = {
           id?: number
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "document_downloads_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       document_tags: {
         Row: {
@@ -167,13 +152,6 @@ export type Database = {
           tag_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "document_tags_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "document_tags_tag_id_fkey"
             columns: ["tag_id"]
@@ -202,15 +180,7 @@ export type Database = {
           user_id?: string | null
           viewed_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "document_views_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       documents: {
         Row: {
@@ -228,7 +198,7 @@ export type Database = {
           summary: string | null
           tags: string | null
           updated_at: string | null
-          uploaded_by: string
+          uploaded_by: string | null
         }
         Insert: {
           created_at?: string | null
@@ -245,7 +215,7 @@ export type Database = {
           summary?: string | null
           tags?: string | null
           updated_at?: string | null
-          uploaded_by: string
+          uploaded_by?: string | null
         }
         Update: {
           created_at?: string | null
@@ -262,7 +232,7 @@ export type Database = {
           summary?: string | null
           tags?: string | null
           updated_at?: string | null
-          uploaded_by?: string
+          uploaded_by?: string | null
         }
         Relationships: [
           {
@@ -299,15 +269,7 @@ export type Database = {
           user_id?: string
           vote_type?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "documents_votes_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       donations: {
         Row: {
@@ -337,15 +299,7 @@ export type Database = {
           message?: string | null
           to_user?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "donations_document_id_fkey"
-            columns: ["document_id"]
-            isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       folders: {
         Row: {
@@ -504,46 +458,61 @@ export type Database = {
       }
       facebook_posts: {
         Row: {
-          content: string | null
+          content: string
           converted_time: string | null
           created_at: string
           id: number
           images: string | null
-          is_hot_news: boolean
+          is_hot_news: boolean | null
+          is_pinned: boolean | null
+          original_time: string | null
           page_name: string | null
-          short_name: string | null
-          time: string | null
-          title: string | null
-          type: Database["public"]["Enums"]["fb_post_type"] | null
-          url: string | null
+          short_name: string
+          source_from: string
+          summarization: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          url: string
+          uuid: string | null
         }
         Insert: {
-          content?: string | null
+          content: string
           converted_time?: string | null
           created_at?: string
           id?: number
           images?: string | null
-          is_hot_news?: boolean
+          is_hot_news?: boolean | null
+          is_pinned?: boolean | null
+          original_time?: string | null
           page_name?: string | null
-          short_name?: string | null
-          time?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["fb_post_type"] | null
-          url?: string | null
+          short_name: string
+          source_from?: string
+          summarization?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          url: string
+          uuid?: string | null
         }
         Update: {
-          content?: string | null
+          content?: string
           converted_time?: string | null
           created_at?: string
           id?: number
           images?: string | null
-          is_hot_news?: boolean
+          is_hot_news?: boolean | null
+          is_pinned?: boolean | null
+          original_time?: string | null
           page_name?: string | null
-          short_name?: string | null
-          time?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["fb_post_type"] | null
-          url?: string | null
+          short_name?: string
+          source_from?: string
+          summarization?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+          uuid?: string | null
         }
         Relationships: []
       }
@@ -652,6 +621,42 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles_rss_favorites: {
+        Row: {
+          created_at: string
+          profile_short_name: string
+          status: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          profile_short_name: string
+          status?: boolean | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          profile_short_name?: string
+          status?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_rss_favorites_profile_short_name_fkey"
+            columns: ["profile_short_name"]
+            isOneToOne: false
+            referencedRelation: "rss_profiles"
+            referencedColumns: ["short_name"]
+          },
+          {
+            foreignKeyName: "profiles_rss_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string
@@ -702,21 +707,54 @@ export type Database = {
       rss_profiles: {
         Row: {
           avatar: string | null
+          created_at: string | null
           name: string | null
           short_name: string
+          source_from: string | null
+          updated_at: string | null
           url: string | null
         }
         Insert: {
           avatar?: string | null
+          created_at?: string | null
           name?: string | null
           short_name: string
+          source_from?: string | null
+          updated_at?: string | null
           url?: string | null
         }
         Update: {
           avatar?: string | null
+          created_at?: string | null
           name?: string | null
           short_name?: string
+          source_from?: string | null
+          updated_at?: string | null
           url?: string | null
+        }
+        Relationships: []
+      }
+      scraped_post_tags: {
+        Row: {
+          created_at: string
+          id: number
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1202,6 +1240,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      f_unaccent: { Args: { "": string }; Returns: string }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
@@ -1211,11 +1250,13 @@ export type Database = {
           similarity: number
         }[]
       }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       category_type: "global" | "user"
       doc_category: "default" | "văn bản"
       fb_post_type: "training_point" | "event" | "other"
+      scraping_source_from: "facebook" | "tdmu.edu.vn"
       workflow_handler_type: "AUTHOR" | "GROUP" | "USER" | "CHOOSE_USER"
       workflow_status:
         | "receive"
@@ -1358,6 +1399,7 @@ export const Constants = {
       category_type: ["global", "user"],
       doc_category: ["default", "văn bản"],
       fb_post_type: ["training_point", "event", "other"],
+      scraping_source_from: ["facebook", "tdmu.edu.vn"],
       workflow_handler_type: ["AUTHOR", "GROUP", "USER", "CHOOSE_USER"],
       workflow_status: [
         "receive",
