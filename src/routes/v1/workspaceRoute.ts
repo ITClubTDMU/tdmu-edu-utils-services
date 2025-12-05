@@ -14,7 +14,8 @@ import {
   updateWorkspace,
   deleteWorkspace,
   downloadProject,
-  updateProjectName
+  updateProjectName,
+  changeProjectOriginFile
 } from '~/controllers/workspaceController';
 import {
   applyVars,
@@ -39,6 +40,7 @@ router.delete('/:id', deleteWorkspace);
 router.put('/:id', updateWorkspace);
 
 router.post('/create-project', upload.single('file'), createProject);
+router.post('/change-project-origin-file', upload.single('file'), changeProjectOriginFile);
 router.get('/:workspace_id/projects', getProjects);
 router.get('/:workspace_id/projects/:project_id', getProject);
 router.delete('/:workspace_id/projects/:project_id', deleteProject);

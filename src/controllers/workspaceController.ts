@@ -133,7 +133,7 @@ export async function createProject(req: Request, res: Response, next: NextFunct
     });
 
     if (error) throw error;
-    res.json(createHttpSuccess(data));
+    res.status(200).json(createHttpSuccess(data));
   } catch (err) {
     await rollbackFileIfError(id, next);
     next(err);
@@ -302,6 +302,72 @@ export async function updateProjectName(req: Request, res: Response, next: NextF
       .eq('id', project_id);
     if (error) throw error;
     res.json(createHttpSuccess({ name, project_id }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function changeProjectOriginFile(req: Request, res: Response, next: NextFunction) {
+  try {
+    const file = req.file;
+    if (!file) {
+      throw createHttpErr(ErrorKey.MISSING_KEY, 'Missing "file" key');
+    }
+    if (file.originalname.split('.').pop() !== 'docx') {
+      throw createHttpErr(ErrorKey.BAD_REQUEST, 'File must be a docx file');
+    }
+    file.filename = file.originalname.split('.')[0];
+
+    const body = JSON.parse(req.body.data);
+    const { projectId } = body;
+
+    const { data: project, error: errorProject } = await sbdb
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .maybeSingle();
+
+    if (errorProject) throw errorProject;
+    if (project == null) throw createHttpErr(ErrorKey.NOT_FOUND, 'Project not found');
+
+    const file_path = JSON.parse(JSON.stringify(project.file_path));
+
+    const { error } = await sbdb.storage
+      .from(BUCKET_NAME.WORKSPACES)
+      .remove([file_path.origin, file_path.preview, file_path.originFullPath, file_path.previewFullPath]);
+
+    if (error) throw error;
+
+    const { data: fileDocx, error: errorDocx } = await sbdb.storage
+      .from(BUCKET_NAME.WORKSPACES)
+      .upload(projectId + '/' + project.name + '.docx', file.buffer, {
+        contentType: file.mimetype
+      });
+    if (errorDocx) throw errorDocx;
+
+    const bufferPdf = await docxToPdf(req, file.buffer, project.name + '.docx');
+
+    const { data: filePdf, error: errorPdf } = await sbdb.storage
+      .from(BUCKET_NAME.WORKSPACES)
+      .upload(projectId + '/' + project.name + '.pdf', bufferPdf, {
+        contentType: 'application/pdf'
+      });
+    if (errorPdf) throw errorPdf;
+
+    const new_file_path = {
+      origin: fileDocx.path,
+      preview: filePdf.path,
+      originFullPath: fileDocx.fullPath,
+      previewFullPath: filePdf.fullPath
+    };
+
+    const { data, error: errorUpdateProject } = await sbdb
+      .from('projects')
+      .update({ file_path: new_file_path })
+      .eq('id', projectId);
+    if (errorUpdateProject) throw errorUpdateProject;
+
+    res.json(createHttpSuccess({ success: true }));
   } catch (err) {
     next(err);
   }

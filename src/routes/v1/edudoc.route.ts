@@ -22,9 +22,10 @@ import multerLib from '~/lib/multer';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 const router = Router();
 
-const upload = multer({
-  storage: multerLib.storageUpload
-});
+// --- Use this configuration ---
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 router.get('/test', edudocTest);
 

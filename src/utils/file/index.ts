@@ -57,7 +57,7 @@ export const docxToPdf = async (req: Request, fileInput: Blob | Buffer | null, f
       ...formData.getHeaders() // Quan trọng: để axios biết multipart/form-data với boundary
     },
     responseType: 'arraybuffer', // **Phải dùng arraybuffer để nhận binary**
-
+    timeout: 60000,
     maxContentLength: Infinity, // Tùy chọn cho file lớn
     maxBodyLength: Infinity
   });
@@ -97,7 +97,6 @@ export async function modifyDocxWithVars(
 
     doc.render(replacements ?? {});
     const bff = doc.getZip().generate({ type: 'nodebuffer' });
-
 
     const { data, error } = await sbdb.storage.from(bucket ?? 'TMP').upload(outputPath ?? 'TMP', bff, {
       contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

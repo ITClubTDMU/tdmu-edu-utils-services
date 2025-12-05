@@ -2,3 +2,5 @@ node_modules/
 dist/
 archive/
 .env.*
+
+.env*

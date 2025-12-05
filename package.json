@@ -22,6 +22,7 @@
     "@types/express": "^5.0.1",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.15.3",
+    "@types/nodemailer": "^7.0.4",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
@@ -36,6 +37,8 @@
     "typescript-eslint": "^8.31.1"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.943.0",
+    "@aws-sdk/client-sesv2": "^3.943.0",
     "@supabase/supabase-js": "^2.55.0",
     "axios": "^1.11.0",
     "base64-arraybuffer": "^1.0.2",
@@ -51,6 +54,7 @@
     "http": "^0.0.1-security",
     "jose": "^6.0.12",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.11",
     "openai": "^4.97.0",
     "pdfjs-dist": "^5.4.54",
     "pizzip": "^3.2.0",

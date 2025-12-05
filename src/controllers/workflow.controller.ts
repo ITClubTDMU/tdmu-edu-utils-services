@@ -1,5 +1,7 @@
 import { QueryData } from '@supabase/supabase-js';
 import { NextFunction, Request, Response } from 'express';
+import transporter from '~/lib/nodemailer';
+import { sesClient, sesClientV2 } from '~/lib/sesClient';
 import { sbdb } from '~/lib/supabase';
 import { Database } from '~/types/db/database.types';
 import { ErrorKey } from '~/types/http';
@@ -190,7 +192,16 @@ export async function createNewInstance(req: Request, res: Response, next: NextF
 export async function submitInstance(req: Request, res: Response, next: NextFunction) {
   try {
     const { instanceId: instance_id } = req.params;
-    const { action, currentStep, comment, workflowId: workflow_id, formData } = req.body;
+    const { action, currentStep, comment, workflowId: workflow_id, formData, authorEmail } = req.body;
+
+    const { data: workflowData, error: workflowError } = await sbdb
+      .from('workflow_info')
+      .select('*')
+      .eq('id', workflow_id)
+      .maybeSingle();
+    if (workflowError) throw createHttpErr(ErrorKey.DB_ERROR, workflowError.message);
+    if (workflowData == null) throw createHttpErr(ErrorKey.NOT_FOUND, 'Workflow not found');
+    const workflowName = workflowData.name ?? 'Đơn xin phép';
 
     const { data: nextStepData, error: nextStepError } = await sbdb
       .from('workflow_steps')
@@ -208,6 +219,17 @@ export async function submitInstance(req: Request, res: Response, next: NextFunc
       nextStep = 1;
       if (action === EWorkflowAction.REJECT) nextStatus = EWorkflowAction.REJECT;
     }
+
+    const statusText = (() => {
+      switch (action) {
+        case EWorkflowAction.REJECT:
+          return 'Từ chối';
+        case EWorkflowAction.ALIGNING:
+          return 'Cần hiệu chỉnh';
+        default:
+          return 'Hợp lệ';
+      }
+    })();
 
     // if next step is end, then end this workflow instance
     if (nextStepData.is_end) nextStep += 1;
@@ -231,6 +253,16 @@ export async function submitInstance(req: Request, res: Response, next: NextFunc
       action_by: req.user_id!
     });
     if (historyError) throw createHttpErr(ErrorKey.DB_ERROR, historyError.message);
+
+    console.log('currentStep', authorEmail, currentStep);
+    if (currentStep !== 1) {
+      await transporter.sendMail({
+        from: 'minhnv155@gmail.com',
+        to: authorEmail,
+        subject: `Phòng ban đã đánh dấu yêu cầu của bạn về "${workflowName}" là ${statusText}`,
+        text: `Phòng ban đã đánh dấu yêu cầu của bạn về "${workflowName}" là ${statusText}. Vui lòng kiểm tra tại đây: ${process.env.CLIENT_URL}/vi/services/workflow/${workflowData.id}/${workflowData.type}_${instance_id}`
+      });
+    }
 
     res.json(createHttpSuccess({ message: 'Workflow instance submitted successfully' }));
   } catch (err) {

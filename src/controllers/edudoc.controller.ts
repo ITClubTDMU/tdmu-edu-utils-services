@@ -1,3 +1,4 @@
+import { decode } from 'base64-arraybuffer';
 import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 import { DEFAULT_PAGINATION } from '~/config';
@@ -57,7 +58,7 @@ export const getListDocuments = async (req: Request, res: Response, next: NextFu
         const { data: authorData } = await sbdb
           .from('profiles')
           .select('*')
-          .eq('id', document.uploaded_by)
+          .eq('id', document.uploaded_by!)
           .maybeSingle();
 
         const countInfo = {
@@ -117,7 +118,7 @@ export const getDocumentById = async (req: Request, res: Response, next: NextFun
       hasDownloaded: downloadData?.some((download) => download.user_id == req?.user_id)
     };
 
-    const { data: authorData } = await sbdb.from('profiles').select('*').eq('id', data.uploaded_by).maybeSingle();
+    const { data: authorData } = await sbdb.from('profiles').select('*').eq('id', data.uploaded_by!).maybeSingle();
 
     const documentInfo = { ...data, authorInfo: authorData, countInfo, moreInfo };
     res.status(200).json(createHttpSuccess(documentInfo));
@@ -137,13 +138,14 @@ export const createDocument = async (req: Request, res: Response, next: NextFunc
     const user_id = req.user_id ?? '';
     const bucket = BUCKET_NAME.EDUDOC_DOCUMENTS;
 
+    const arrayBuffer = decode(file.buffer.toString('base64'));
+    const documentData = JSON.parse(req.body.data);
     const filePath = user_id + '/' + file.originalname;
-    const { data: fileData, error: fileError } = await sbdb.storage.from(bucket).upload(filePath, file.buffer, {
-      contentType: file.mimetype
+    const { data: fileData, error: fileError } = await sbdb.storage.from(bucket).upload(filePath, arrayBuffer, {
+      contentType: file.mimetype,
+      upsert: true
     });
     if (fileError) throw createHttpErr(ErrorKey.DB_ERROR, fileError.message);
-
-    const documentData = JSON.parse(req.body.data);
 
     const { data, error } = await sbdb
       .schema('edudoc')
@@ -212,7 +214,7 @@ export const getDocumentInTrash = async (req: Request, res: Response, next: Next
         const { data: authorData } = await sbdb
           .from('profiles')
           .select('*')
-          .eq('id', document.uploaded_by)
+          .eq('id', document.uploaded_by!)
           .maybeSingle();
 
         return { ...document, authorInfo: authorData };
